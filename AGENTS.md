@@ -24,7 +24,7 @@ There is no test suite, linting, or CI beyond the publish workflow.
 ```
 Dockerfile                        → Defines the image (base image, Tailscale, apt packages, Crush, Oh My Zsh, TypeScript, env vars, entrypoint)
 entrypoint.sh                     → Runs on every container start (starts Tailscale, fetches neovim config, writes shell aliases)
-crush/crush.json                  → Crush config with z.ai provider (API key via $ZAI_API_KEY env var)
+crush/crush.json                  → Crush config referencing the built-in z.ai Catwalk provider (API key via $ZAI_API_KEY env var)
 init.lua                          → Default neovim config (bundled in image, overridden by remote fetch)
 .github/workflows/publish.yml     → Builds and pushes multi-arch image to GHCR on push to main
 ```
@@ -51,7 +51,7 @@ init.lua                          → Default neovim config (bundled in image, o
 - **CI uses lowercase repo name**: The publish workflow lowercases `github.repository` to ensure valid GHCR image names.
 - **CI caching**: Uses `cache-from: type=gha` and `cache-to: type=gha,mode=max` for BuildKit cache via GitHub Actions.
 - **Crush (AI coding assistant)**: Installed from GitHub releases as a `.deb` package. Config lives at `/etc/crush/crush.json` (survives bind mounts on `/root`). The `CRUSH_GLOBAL_CONFIG` env var points to it.
-- **Crush API key**: The z.ai provider config uses `$ZAI_API_KEY` env var expansion. Pass `-e ZAI_API_KEY=your-key` at `docker run` to authenticate. Without it, Crush will fail to connect to the provider.
+- **Crush API key**: z.ai is a built-in Catwalk provider that shell-expands `$ZAI_API_KEY` from the env. Pass `-e ZAI_API_KEY=your-key` at `docker run` to authenticate. Without it, Crush will fail to connect to the provider.
 
 ## Gotchas
 

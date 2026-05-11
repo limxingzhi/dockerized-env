@@ -1,10 +1,5 @@
 {
   "$schema": "https://charm.land/crush.json",
-  "providers": {
-    "zai": {
-      "api_key": "$ZAI_API_KEY"
-    }
-  },
   "models": {
     "large": {
       "model": "glm-5.1",
