@@ -82,13 +82,8 @@ VOLUME /root
 # Tailscale state (separate volume)
 VOLUME /var/lib/tailscale
 
-
-# Crush config (outside /root so it survives bind mounts)
-COPY crush/crush.json /etc/crush/crush.json
-ENV CRUSH_GLOBAL_CONFIG=/etc/crush/crush.json
-
-# Crush skills (outside /root so it survives bind mounts)
-COPY skills/ /etc/crush/skills/
+# Agent skills (outside /root so it survives bind mounts)
+COPY skills/ /etc/agents/skills/
 
 # Shell config (outside /root so it survives bind mounts)
 COPY zsh/aliases.zsh /etc/zsh/aliases.zsh

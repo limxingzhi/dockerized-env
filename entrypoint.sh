@@ -7,6 +7,32 @@ NVIM_CONFIG="$NVIM_CONFIG_DIR/init.lua"
 TS_STATE_DIR=/var/lib/tailscale
 TS_SOCKET=/var/run/tailscale/tailscaled.sock
 
+# Bootstrap .zshrc if missing (Oh My Zsh template from /opt)
+if [ ! -f "$ZSHRC" ]; then
+  cp /opt/oh-my-zsh/templates/zshrc.zsh-template "$ZSHRC"
+  sed -i "s|export ZSH=.*|export ZSH=/opt/oh-my-zsh|" "$ZSHRC"
+fi
+
+# Move skills to .config/agents/skills
+mkdir -p /root/.config/agents/skills
+for item in /etc/agents/skills/*; do
+    name=$(basename "$item")
+
+    if [ ! -e "/root/.config/agents/skills/$name" ]; then
+        cp -r "$item" /root/.config/agents/skills
+    else
+        echo "Skipping existing: $name"
+    fi
+done
+
+mkdir -p "$NVIM_CONFIG_DIR"
+if [ ! -f "$NVIM_CONFIG" ]; then
+  echo "No local Neovim config found, using default"
+  cp /etc/nvim/init.lua "$NVIM_CONFIG"
+else
+  echo "Using existing Neovim config"
+fi
+
 # Start Tailscale if auth key is provided
 if [ -n "${TS_AUTHKEY:-}" ]; then
     echo "Starting Tailscale..."
@@ -45,20 +71,6 @@ if [ -n "${TS_AUTHKEY:-}" ]; then
     else
         echo "Tailscale connected (SSH enabled)"
     fi
-fi
-
-# Bootstrap .zshrc if missing (Oh My Zsh template from /opt)
-if [ ! -f "$ZSHRC" ]; then
-  cp /opt/oh-my-zsh/templates/zshrc.zsh-template "$ZSHRC"
-  sed -i "s|export ZSH=.*|export ZSH=/opt/oh-my-zsh|" "$ZSHRC"
-fi
-
-mkdir -p "$NVIM_CONFIG_DIR"
-if [ ! -f "$NVIM_CONFIG" ]; then
-  echo "No local Neovim config found, using default"
-  cp /etc/nvim/init.lua "$NVIM_CONFIG"
-else
-  echo "Using existing Neovim config"
 fi
 
 grep -qxF 'source /etc/zsh/aliases.zsh' "$ZSHRC" 2>/dev/null || echo 'source /etc/zsh/aliases.zsh' >> "$ZSHRC"
