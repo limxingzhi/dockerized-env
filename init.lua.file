@@ -286,7 +286,6 @@ require("lazy").setup({
             "cssls",
             -- "prettier",
             "eslint@4.8.0",
-            "pylsp",
             "denols",
           },
           automatic_installation = true

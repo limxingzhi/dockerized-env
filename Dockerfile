@@ -63,7 +63,7 @@ RUN ARCH=$(uname -m) && \
     rm /tmp/crush.deb
 
 # TypeScript tooling
-RUN npm install -g npm@latest typescript ts-node
+RUN npm install -g npm@latest typescript ts-node tsx http-server
 
 # Oh My Zsh (install to /opt so it survives bind mounts on /root)
 ENV ZSH=/opt/oh-my-zsh
