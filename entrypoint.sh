@@ -27,10 +27,15 @@ done
 
 mkdir -p "$NVIM_CONFIG_DIR"
 if [ ! -f "$NVIM_CONFIG" ]; then
-  echo "No local Neovim config found, using default"
-  cp /etc/nvim/init.lua "$NVIM_CONFIG"
+    echo "Fetching Neovim config from Gist..."
+    if curl -fsSL https://gist.github.com/limxingzhi/fa3be5045caded9d4e09f2423dbfcec7/raw -o "$NVIM_CONFIG" 2>/dev/null; then
+        echo "Config fetched successfully"
+    else
+        echo "Gist fetch failed, using default config"
+        cp /etc/nvim/init.lua "$NVIM_CONFIG"
+    fi
 else
-  echo "Using existing Neovim config"
+    echo "Using existing Neovim config"
 fi
 
 # Start Tailscale if auth key is provided

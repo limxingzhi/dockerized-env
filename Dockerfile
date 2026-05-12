@@ -62,6 +62,16 @@ RUN ARCH=$(uname -m) && \
     dpkg -i /tmp/crush.deb && \
     rm /tmp/crush.deb
 
+# Install Glow (markdown renderer) from Charm
+RUN ARCH=$(uname -m) && \
+    if [ "$ARCH" = "aarch64" ]; then GLOW_ARCH="arm64"; \
+    else GLOW_ARCH="amd64"; fi && \
+    GLOW_VERSION=$(curl -s https://api.github.com/repos/charmbracelet/glow/releases/latest | grep tag_name | cut -d '"' -f 4) && \
+    curl -Lo /tmp/glow.deb \
+      "https://github.com/charmbracelet/glow/releases/download/${GLOW_VERSION}/glow_${GLOW_VERSION#v}_${GLOW_ARCH}.deb" && \
+    dpkg -i /tmp/glow.deb && \
+    rm /tmp/glow.deb
+
 # TypeScript tooling
 RUN npm install -g npm@latest typescript ts-node tsx http-server eslint
 
@@ -78,8 +88,8 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
 # Home as workspace
 WORKDIR /root
 
-# Default nvim config (outside /root, survives bind mounts)
-RUN curl -fsSL https://gist.github.com/limxingzhi/fa3be5045caded9d4e09f2423dbfcec7/raw -o /etc/nvim/init.lua
+# Default nvim config fallback (outside /root, survives bind mounts)
+RUN mkdir -p /etc/nvim && echo 'vim.o.number = true' > /etc/nvim/init.lua
 
 # Persist home directory across restarts (configs, projects, etc.)
 VOLUME /root

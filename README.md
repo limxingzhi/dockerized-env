@@ -1,83 +1,85 @@
-# Dev Environment (Node + TypeScript + Neovim)
+# 🐳 dockerized-env
 
-A lightweight, reproducible containerized development environment. Boots into zsh with neovim, tmux, lazygit, TypeScript tooling, and Oh My Zsh pre-configured. Neovim config is auto-fetched from a GitHub Gist on every start, so the container stays up to date without rebuilding.
+A cute, opinionated dev environment in a container. One `docker run` and you get a fully-loaded workspace with all your favorite CLI tools.
 
-Supports **Tailscale SSH** — connect to your container from anywhere on your tailnet without exposing ports.
+<p align="center">
+  <img src="screenshot.jpg" alt="tmux with Crush and lazygit side by side" width="720" />
+</p>
 
-## What's Included
+> tmux doing what tmux does best — Crush and lazygit running side by side like they were meant to be.
 
-- **Node.js 24** + npm (latest)
-- **TypeScript** (`tsc`, `ts-node`)
-- **Neovim** (set as `EDITOR`/`VISUAL`)
-- **tmux** + **lazygit**
-- **Oh My Zsh**
-- **ripgrep**, **fd-find**, **git**, **curl**, **wget**
-- **Tailscale** (with SSH support)
-- **Crush** (AI coding assistant, from [charm](https://charm.land/))
-- Shell aliases: `n` → `npm`, `nr` → `npm run`, `tat` → tmux session switcher
+## What's inside
 
-## Quick Start
+| Tool | Why you'll love it |
+|------|--------------------|
+| **[Crush](https://github.com/charmbracelet/crush)** | An adorable AI coding assistant that lives in your terminal. Ask it to build, refactor, debug, it just does it. |
+| **Oh My Zsh** | Pretty prompts, sensible defaults, and a warm fuzzy feeling every time you open a shell. |
+| **Tailscale SSH** | Connect from anywhere on your tailnet with `ssh root@my-dev-env`. No SSH keys to manage, no ports to expose, no networking headaches. |
+| **Neovim** | The latest release. Auto-fetches a config from a Gist on every start, or mount your own. |
+| **tmux** | Persistent sessions. Detach, reattach, split panes, and pretend you're a hacker in a movie. |
+| **lazygit** | Git but make it fun. Staging, committing, rebasing, diffing, all from a gorgeous TUI. |
+| **Node.js 24 + TypeScript** | `tsc`, `ts-node`, `tsx`, `eslint`, `http-server` and others |
+| **Deno** | Because why not have a second runtime? |
+| **[Glow](https://github.com/charmbracelet/glow)** | Read markdown files right in your terminal, beautifully rendered. `glow README.md` and swoon. |
+| **ripgrep, fd, fzf, jq** | Commonly used linux utils. |
+| **git** | Obviously. |
+
+## Quick start
 
 ```sh
 # Build
 docker build -t dev-env .
 
-# Run (persist home directory)
+# Run (persists your home directory across restarts)
 docker run -it --rm -v dev-env-home:/root dev-env
 ```
 
-### With Git credentials
+That's it. You're in a zsh shell with everything ready to go.
+
+## Git credentials (optional)
+
+To `git push`/`pull` private repos, mount your SSH key and git config into the container:
 
 ```sh
 docker run -it --rm \
   -v dev-env-home:/root \
-  -v ~/.gitconfig:/root/.gitconfig:ro \
   -v ~/.ssh:/root/.ssh:ro \
+  -v ~/.gitconfig:/root/.gitconfig:ro \
   dev-env
 ```
 
-### With Tailscale SSH
+- **`~/.ssh`** — your SSH key for authenticating with GitHub, GitLab, etc. Mounted read-only so the container can't modify it.
+- **`~/.gitconfig`** — your name, email, and any git preferences. Without this, commits will use default/generic values.
+
+Both are optional — the container works fine without them for local-only work.
+
+## SSH from anywhere with Tailscale
+
+No need to manage SSH keys, open ports, or worry about connectivity. Tailscale gives your container a stable identity on your private network and handles auth + encryption automatically.
 
 ```sh
 docker run -it --rm \
   -v dev-env-home:/root \
   -v tailscale-state:/var/lib/tailscale \
-  -v ~/.gitconfig:/root/.gitconfig:ro \
   -e TS_AUTHKEY=tskey-auth-xxxxx \
   -e TS_HOSTNAME=my-dev-env \
   dev-env
+
+volumes:
+  ws_01_ts_state:
 ```
 
-Then SSH in from any device on your tailnet:
+Then from any device on your tailnet:
 
 ```sh
 ssh root@my-dev-env
 ```
 
-No ports to expose. Tailscale handles authentication and encryption.
+State is persisted in the `tailscale-state` volume — omit `TS_AUTHKEY` on subsequent runs.
 
-Home directory and Tailscale state are persisted as separate Docker volumes. On subsequent starts, just omit `TS_AUTHKEY`.
+## Using Crush
 
-### docker-compose
-
-```yaml
-services:
-  workspace_01:
-    image: ghcr.io/limxingzhi/dockerized-env:2026.05.11
-    container_name: workspace_01
-    volumes:
-      - /volume1/docker/dev_container/workspace_01:/root
-      - /volume1/docker/dev_container/config/.ssh:/root/.ssh
-      - /volume1/docker/dev_container/config/.gitconfig:/root/.gitconfig
-      - ws_01_ts_state:/var/lib/tailscale
-    environment:
-      - TS_AUTHKEY=tskey-auth-keygoeshere
-      - TS_HOSTNAME=dev01
-    network_mode: host
-
-volumes:
-  ws_01_ts_state:
-```
+Then just run `crush` and start chatting. Config lives in your /root path, so it will persist between reboots.
 
 ## Environment Variables
 
@@ -100,17 +102,46 @@ To use your own config, mount it:
 docker run -it --rm -v ./my-init.lua:/root/.config/nvim/init.lua dev-env
 ```
 
-## Multi-Architecture
+## docker-compose
+
+```yaml
+services:
+  workspace:
+    image: ghcr.io/limxingzhi/dockerized-env:latest
+    container_name: workspace
+    volumes:
+      - dev-home:/root
+      - ~/.ssh:/root/.ssh:ro
+      - ~/.gitconfig:/root/.gitconfig:ro
+      - tailscale-state:/var/lib/tailscale
+    environment:
+      - TS_AUTHKEY=tskey-auth-keygoeshere
+      - TS_HOSTNAME=my-dev-env
+    network_mode: host
+
+volumes:
+  dev-home:
+  tailscale-state:
+```
+
+## Handy aliases
+
+Built into every shell:
+
+| Alias | Command |
+|-------|---------|
+| `n` | `npm` |
+| `nr` | `npm run` |
+| `tat <name>` | Switch to or create a tmux session by name |
+
+## Multi-architecture
 
 Images are built for **linux/amd64** and **linux/arm64** and published to GHCR on every push to `main`.
 
 ## Notes
 
-- Designed for fast, reproducible dev environments — safe to rebuild anytime
-- Works with VS Code Dev Containers (optional)
+- Designed to be disposable — safe to rebuild anytime
+- Two volumes: `/root` (workspace + configs), `/var/lib/tailscale` (Tailscale state)
+- Tailscale uses **userspace networking** — no `--cap-add` or special permissions needed
+- Tailscale SSH requires an [ACL policy](https://login.tailscale.com/admin/acls) allowing SSH access
 - Image tags: `latest` + date-based (`YYYY.MM.DD`)
-- Uses Tailscale **userspace networking** — no special Docker capabilities (`--cap-add`) needed
-- Crush config lives at `/etc/crush/crush.json` (persists across volume mounts on `/root`)
-- Two volumes: `/root` for configs/projects, `/var/lib/tailscale` for Tailscale state
-- Tailscale SSH requires an [ACL policy](https://login.tailscale.com/admin/acls) that allows SSH access
-
