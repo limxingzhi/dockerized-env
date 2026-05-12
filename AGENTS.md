@@ -53,6 +53,10 @@ init.lua                          → Default neovim config (bundled in image, o
 - **Crush (AI coding assistant)**: Installed from GitHub releases as a `.deb` package. Config lives at `/etc/crush/crush.json` (survives bind mounts on `/root`). The `CRUSH_GLOBAL_CONFIG` env var points to it.
 - **Crush API key**: z.ai is a built-in Catwalk provider that shell-expands `$ZAI_API_KEY` from the env. Pass `-e ZAI_API_KEY=your-key` at `docker run` to authenticate. Without it, Crush will fail to connect to the provider.
 
+## Preferences
+
+- When asked to commit, only commit — never push to remote unless asked.
+
 ## Gotchas
 
 - **`init.lua` is `COPY`ed but doesn't exist in the repo** — the `Dockerfile` line `COPY init.lua /root/.config/nvim/init.lua` will fail on `docker build` unless an `init.lua` file is present in the build context. This file needs to be created or the `COPY` line removed if relying solely on the remote fetch.

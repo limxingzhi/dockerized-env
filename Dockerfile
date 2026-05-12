@@ -63,7 +63,12 @@ RUN ARCH=$(uname -m) && \
     rm /tmp/crush.deb
 
 # TypeScript tooling
-RUN npm install -g npm@latest typescript ts-node tsx http-server
+RUN npm install -g npm@latest typescript ts-node tsx http-server eslint
+
+# Install Deno
+RUN curl -fsSL https://deno.land/install.sh | sh \
+    && mv /root/.deno/bin/deno /usr/local/bin/deno \
+    && rm -rf /root/.deno
 
 # Oh My Zsh (install to /opt so it survives bind mounts on /root)
 ENV ZSH=/opt/oh-my-zsh
@@ -74,7 +79,7 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
 WORKDIR /root
 
 # Default nvim config (outside /root, survives bind mounts)
-COPY init.lua.file /etc/nvim/init.lua
+RUN curl -fsSL https://gist.github.com/limxingzhi/fa3be5045caded9d4e09f2423dbfcec7/raw -o /etc/nvim/init.lua
 
 # Persist home directory across restarts (configs, projects, etc.)
 VOLUME /root
