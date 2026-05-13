@@ -2,8 +2,6 @@ FROM node:24-bookworm
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TERM=xterm-256color
-ENV EDITOR=nvim
-ENV VISUAL=nvim
 ENV TZ=UTC
 
 # Tailscale
@@ -107,7 +105,7 @@ COPY crush/crush.json /etc/crush/crush.json
 ENV CRUSH_GLOBAL_CONFIG=/etc/crush/crush.json
 
 # Shell config (outside /root so it survives bind mounts)
-COPY zsh/aliases.zsh /etc/zsh/aliases.zsh
+COPY init.zsh /etc/zsh/init.zsh
 
 # Tmux config (outside /root so it survives bind mounts)
 COPY tmux/tmux.conf /etc/tmux/tmux.conf

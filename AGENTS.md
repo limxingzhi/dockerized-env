@@ -27,7 +27,7 @@ crush/crush.json              → Crush config (zai provider, $ZAI_API_KEY) → 
 tmux/tmux.conf                → Mouse, vi copy, tmux-yank, popup, renumber hooks
 tmux/popup.sh                 → Scratch popup (prefix+s)
 tmux/renumber-sess.sh         → Renumber numeric sessions
-zsh/aliases.zsh               → n, nr, tat
+init.zsh                      → Shell env (EDITOR, aliases, tat fn), sourced from .zshrc
 skills/                       → Crush skills → /etc/agents/skills/
 .github/workflows/publish.yml → Multi-arch GHCR publish
 ```

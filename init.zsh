@@ -1,3 +1,6 @@
+export EDITOR=nvim
+export VISUAL=nvim
+
 alias n="npm"
 alias nr="npm run"
 

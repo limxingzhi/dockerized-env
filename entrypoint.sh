@@ -97,7 +97,7 @@ if [ -n "${TS_AUTHKEY:-}" ]; then
     fi
 fi
 
-grep -qxF 'source /etc/zsh/aliases.zsh' "$ZSHRC" 2>/dev/null || echo 'source /etc/zsh/aliases.zsh' >> "$ZSHRC"
+grep -qxF 'source /etc/zsh/init.zsh' "$ZSHRC" 2>/dev/null || echo 'source /etc/zsh/init.zsh' >> "$ZSHRC"
 
 # If stdin is a tty, exec into the shell. Otherwise just keep the container alive.
 if [ -t 0 ]; then
