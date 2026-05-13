@@ -32,6 +32,12 @@ if [ ! -d /root/.tmux/plugins/tpm ]; then
     cp -r /opt/tmux-plugins/tmux-yank /root/.tmux/plugins/tmux-yank 2>/dev/null || true
 fi
 
+# Ensure Crush config exists in default data path (prevents first-run override)
+mkdir -p /root/.local/share/crush
+if [ ! -f /root/.local/share/crush/crush.json ]; then
+    cp /etc/crush/crush.json /root/.local/share/crush/crush.json
+fi
+
 # Move skills to .config/agents/skills
 mkdir -p /root/.config/agents/skills
 for item in /etc/agents/skills/*; do

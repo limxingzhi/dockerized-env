@@ -12,14 +12,24 @@
       "provider": "zai"
     }
   },
+  "options": {
+    "auto_lsp": true
+  },
   "lsp": {
     "typescript": {
       "command": "typescript-language-server",
-      "args": ["--stdio"]
+      "args": ["--stdio"],
+      "root_markers": ["tsconfig.json", "package.json"]
+    },
+    "javascript": {
+      "command": "typescript-language-server",
+      "args": ["--stdio"],
+      "root_markers": ["jsconfig.json", "package.json"]
     },
     "deno": {
       "command": "deno",
-      "args": ["lsp"]
+      "args": ["lsp"],
+      "root_markers": ["deno.json", "deno.jsonc"]
     },
     "bash": {
       "command": "bash-language-server",
