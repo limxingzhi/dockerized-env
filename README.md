@@ -20,6 +20,7 @@ A cute, opinionated dev environment in a container. One `docker run` and you get
 | **lazygit** | Git but make it fun. Staging, committing, rebasing, diffing — all from a gorgeous TUI. |
 | **Node.js 24 + TypeScript** | `tsc`, `ts-node`, `tsx`, `eslint`, `http-server` and more. |
 | **Deno** | Because why not have a second runtime? |
+| **LSP support** | Crush ships with language servers for TypeScript, Deno, and Bash. |
 | **[Glow](https://github.com/charmbracelet/glow)** | Read markdown files right in your terminal, beautifully rendered. `glow README.md` and swoon. |
 | **ripgrep, fd, fzf, jq** | The holy quaternity of "wait, that was fast." |
 | **git** | Obviously. |

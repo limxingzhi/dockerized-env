@@ -23,7 +23,7 @@ Docker dev environment on `node:24-bookworm`: neovim, tmux, lazygit, TypeScript,
 ```
 Dockerfile                    → Image (packages, Crush, Glow, Oh My Zsh, TS, Deno, tmux plugins, entrypoint)
 entrypoint.sh                 → Runtime: Tailscale, tmux, plugins, neovim config, aliases
-crush/crush.json              → Crush config (zai provider, $ZAI_API_KEY) → /etc/crush/crush.json
+crush/crush.json              → Crush config (zai provider, $ZAI_API_KEY, LSPs) → /etc/crush/crush.json
 tmux/tmux.conf                → Mouse, vi copy, tmux-yank, popup, renumber hooks
 tmux/popup.sh                 → Scratch popup (prefix+s)
 tmux/renumber-sess.sh         → Renumber numeric sessions
@@ -41,7 +41,7 @@ skills/                       → Crush skills → /etc/agents/skills/
 - **Tailscale**: `pkgs.tailscale.com` apt repo. Userspace networking (no `--cap-add`). State in `/var/lib/tailscale` volume. SSH via `--ssh` (needs Tailscale ACL). Runs unsupervised in background — crash kills SSH, not container. Socket poll up to 15s.
 - **tmux**: `/etc/tmux/tmux.conf` symlinked. Plugins at build → `/opt/tmux-plugins/`, copied at runtime. tmux-yank via OSC 52 (no `xsel`). Popup `prefix+s`. Renumber on create/close/rename.
 - **Neovim**: Runtime fetch from Gist, fallback `/etc/nvim/init.lua`. Gist URL hardcoded in `entrypoint.sh`.
-- **Crush**: `.deb` from GitHub releases. Config `/etc/crush/crush.json`. Z.AI provider with `$ZAI_API_KEY`.
+- **Crush**: `.deb` from GitHub releases. Config `/etc/crush/crush.json`. Z.AI provider with `$ZAI_API_KEY`. LSPs for TypeScript, Deno, and Bash.
 - **CI**: GHA BuildKit cache. Date tags (not semver) — same-day pushes overwrite. No `.dockerignore`.
 
 ## Preferences

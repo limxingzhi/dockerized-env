@@ -11,5 +11,19 @@
       "model": "glm-4.7-flash",
       "provider": "zai"
     }
+  },
+  "lsp": {
+    "typescript": {
+      "command": "typescript-language-server",
+      "args": ["--stdio"]
+    },
+    "deno": {
+      "command": "deno",
+      "args": ["lsp"]
+    },
+    "bash": {
+      "command": "bash-language-server",
+      "args": ["start"]
+    }
   }
 }
