@@ -4,7 +4,7 @@
 
 A Docker-based development environment image built on `node:24-bookworm`. It provisions a ready-to-use workspace with neovim, tmux, lazygit, TypeScript tooling, Oh My Zsh, Crush (AI coding assistant), Glow, and Tailscale (with SSH), then bootstraps tmux config, shell aliases, and a remote neovim config on container startup.
 
-The image is published to `ghcr.io` on every push to `main` for both `linux/amd64` and `linux/arm64`.
+The image is published to `ghcr.io` on every push to `main` (tagged `latest` + date) and `dev` (tagged `dev` + `dev-DATE`) for both `linux/amd64` and `linux/arm64`.
 
 ## Commands
 
@@ -62,7 +62,7 @@ skills/                           → Crush agent skills (copied to /etc/agents/
 - **tmux session renumbering**: Hooks on `session-created`, `session-closed`, and `session-renamed` run `/etc/tmux/renumber-sess.sh` to renumber numeric sessions sequentially.
 - **Idempotent zshrc modifications**: The script uses `grep -qxF` to check before appending, so repeated starts don't duplicate aliases.
 - **`tat` function**: Switches to or creates a tmux session by name. Behaves differently depending on whether already inside tmux.
-- **CI uses lowercase repo name**: The publish workflow lowercases `github.repository` to ensure valid GHCR image names.
+- **Branch-aware image tags**: Pushes to `main` produce `latest` and date-based (e.g. `2026.05.13`) tags. Pushes to `dev` produce `dev` and `dev-DATE` (e.g. `dev-2026.05.13`) tags.
 - **CI caching**: Uses `cache-from: type=gha` and `cache-to: type=gha,mode=max` for BuildKit cache via GitHub Actions.
 - **Crush (AI coding assistant)**: Installed from GitHub releases as a `.deb` package. Config lives at `/etc/crush/crush.json` (survives bind mounts on `/root`). The `CRUSH_GLOBAL_CONFIG` env var points to it.
 - **Crush uses Z.AI directly**: The zai provider connects to `https://api.z.ai/api/coding/paas/v4` using `$ZAI_API_KEY`. Pass `-e ZAI_API_KEY=your-key` at `docker run` to authenticate. Without it, Crush will fail to connect to the provider.
