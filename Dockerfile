@@ -103,6 +103,16 @@ COPY skills/ /etc/agents/skills/
 # Shell config (outside /root so it survives bind mounts)
 COPY zsh/aliases.zsh /etc/zsh/aliases.zsh
 
+# Tmux config (outside /root so it survives bind mounts)
+COPY tmux/tmux.conf /etc/tmux/tmux.conf
+COPY tmux/popup.sh /etc/tmux/popup.sh
+COPY tmux/renumber-sess.sh /etc/tmux/renumber-sess.sh
+RUN chmod +x /etc/tmux/popup.sh /etc/tmux/renumber-sess.sh
+
+# Install TPM and tmux-yank at build time
+RUN git clone https://github.com/tmux-plugins/tpm /opt/tmux-plugins/tpm \
+    && git clone https://github.com/tmux-plugins/tmux-yank /opt/tmux-plugins/tmux-yank
+
 # Entrypoint
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh

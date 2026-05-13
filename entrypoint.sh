@@ -4,6 +4,7 @@ set -euo pipefail
 ZSHRC=/root/.zshrc
 NVIM_CONFIG_DIR="$HOME/.config/nvim"
 NVIM_CONFIG="$NVIM_CONFIG_DIR/init.lua"
+TMUX_CONFIG="$HOME/.tmux.conf"
 TS_STATE_DIR=/var/lib/tailscale
 TS_SOCKET=/var/run/tailscale/tailscaled.sock
 
@@ -11,6 +12,18 @@ TS_SOCKET=/var/run/tailscale/tailscaled.sock
 if [ ! -f "$ZSHRC" ]; then
   cp /opt/oh-my-zsh/templates/zshrc.zsh-template "$ZSHRC"
   sed -i "s|export ZSH=.*|export ZSH=/opt/oh-my-zsh|" "$ZSHRC"
+fi
+
+# Link tmux config if not present
+if [ ! -f "$TMUX_CONFIG" ]; then
+    ln -s /etc/tmux/tmux.conf "$TMUX_CONFIG"
+fi
+
+# Copy tmux plugins if not present
+if [ ! -d /root/.tmux/plugins/tpm ]; then
+    mkdir -p /root/.tmux/plugins
+    cp -r /opt/tmux-plugins/tpm /root/.tmux/plugins/tpm
+    cp -r /opt/tmux-plugins/tmux-yank /root/.tmux/plugins/tmux-yank 2>/dev/null || true
 fi
 
 # Move skills to .config/agents/skills
