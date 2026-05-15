@@ -111,7 +111,8 @@ COPY init.zsh /etc/zsh/init.zsh
 COPY tmux/tmux.conf /etc/tmux/tmux.conf
 COPY tmux/popup.sh /etc/tmux/popup.sh
 COPY tmux/renumber-sess.sh /etc/tmux/renumber-sess.sh
-RUN chmod +x /etc/tmux/popup.sh /etc/tmux/renumber-sess.sh
+COPY tmux/session-status.sh /etc/tmux/session-status.sh
+RUN chmod +x /etc/tmux/popup.sh /etc/tmux/renumber-sess.sh /etc/tmux/session-status.sh
 
 # Install TPM and tmux-yank at build time
 RUN git clone https://github.com/tmux-plugins/tpm /opt/tmux-plugins/tpm \

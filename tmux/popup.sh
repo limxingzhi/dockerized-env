@@ -8,4 +8,4 @@ if [ $? != 0 ]; then
   tmux new-session -d -s "${NEW_SESSION_NAME}"
 fi
 
-tmux display-popup -E -h 90% -w 80% "tmux attach-session -t ${NEW_SESSION_NAME}"
+tmux display-popup -E -h 90% -w 80% "tmux attach-session -t ${NEW_SESSION_NAME}; tmux refresh-client"
