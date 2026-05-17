@@ -72,12 +72,16 @@ No need to manage SSH keys, open ports, or worry about connectivity. Tailscale g
 
 ```sh
 docker run -it --rm \
+  --cap-add=NET_ADMIN \
+  --device /dev/net/tun \
   -v dev-env-home:/root \
   -v tailscale-state:/var/lib/tailscale \
   -e TS_AUTHKEY=tskey-auth-xxxxx \
   -e TS_HOSTNAME=my-dev-env \
   dev-env
 ```
+
+> Without `--cap-add=NET_ADMIN --device /dev/net/tun`, Tailscale falls back to userspace networking (SSH only, no `ping`).
 
 Then from any device on your tailnet:
 
@@ -173,6 +177,10 @@ services:
   workspace:
     image: ghcr.io/limxingzhi/telescreen:latest
     container_name: workspace
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
     volumes:
       - dev-home:/root
       - ~/.ssh:/root/.ssh:ro
@@ -182,12 +190,13 @@ services:
       - TS_AUTHKEY=tskey-auth-keygoeshere
       - TS_HOSTNAME=my-dev-env
       - ZAI_API_KEY=your-zai-api-key
-    network_mode: host
 
 volumes:
   dev-home:
   tailscale-state:
 ```
+
+Omit `cap_add` and `devices` to fall back to userspace networking (SSH only, no `ping`).
 
 ## Handy aliases
 
@@ -215,7 +224,7 @@ Images are built for **linux/amd64** and **linux/arm64** and published to GHCR o
 
 - Designed to be disposable - safe to rebuild anytime
 - Two volumes: `/root` (workspace + configs), `/var/lib/tailscale` (Tailscale state)
-- Tailscale uses **userspace networking** - no `--cap-add` or special permissions needed
+- Tailscale uses **tun mode** when `/dev/net/tun` is available (requires `--cap-add=NET_ADMIN --device /dev/net/tun`). Falls back to userspace networking otherwise. Netfilter is disabled in tun mode for container compatibility.
 - Tailscale SSH requires an [ACL policy](https://login.tailscale.com/admin/acls) allowing SSH access
 - Image tags: `latest` + date-based (`YYYY.MM.DD`)
 - tmux plugins (TPM + tmux-yank) are pre-installed at build time and linked on first start

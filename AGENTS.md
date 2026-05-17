@@ -14,7 +14,7 @@ Docker dev environment on `node:24-bookworm`: neovim, tmux, lazygit, TypeScript,
 | Run | `docker run -it --rm telescreen` |
 | Persistent home | `docker run -it --rm -v dev-env-home:/root telescreen` |
 | Timezone | `-e TZ=America/New_York` |
-| Tailscale SSH | `-v tailscale-state:/var/lib/tailscale -e TS_AUTHKEY=tskey-auth-xxx -e TS_HOSTNAME=my-dev-env` |
+| Tailscale SSH | `--cap-add=NET_ADMIN --device /dev/net/tun -v tailscale-state:/var/lib/tailscale -e TS_AUTHKEY=tskey-auth-xxx -e TS_HOSTNAME=my-dev-env` |
 | Crush | `-e ZAI_API_KEY=your-key` |
 | Multi-arch | `docker buildx build --platform linux/amd64,linux/arm64 -t telescreen .` |
 
@@ -57,7 +57,8 @@ Configs live in `/etc/` so they survive volume mounts on `/root`.
 
 ## Gotchas
 
-- `tailscaled` unsupervised - crash breaks SSH only, not the container. Socket poll up to 15s.
+- `tailscaled` auto-detects `/dev/net/tun` — uses tun mode when available, falls back to userspace networking
+- Tailscale uses `--netfilter-mode=off` in tun mode (container kernels often lack nftables support)
 - No `.dockerignore` - full build context sent on every build.
 - Same-day pushes overwrite date tag.
 - Neovim Gist URL hardcoded in `entrypoint.sh`.

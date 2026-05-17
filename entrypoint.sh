@@ -69,9 +69,16 @@ if [ -n "${TS_AUTHKEY:-}" ]; then
     mkdir -p "$TS_STATE_DIR"
     rm -f "$TS_SOCKET"
 
-    tailscaled --tun=userspace-networking \
-        --state="$TS_STATE_DIR/tailscaled.state" \
-        --socket="$TS_SOCKET" &>/tmp/tailscaled.log &
+    if [ -c /dev/net/tun ]; then
+        echo "Starting Tailscale (tun mode)..."
+        tailscaled --state="$TS_STATE_DIR/tailscaled.state" \
+            --socket="$TS_SOCKET" &>/tmp/tailscaled.log &
+    else
+        echo "Starting Tailscale (userspace mode)..."
+        tailscaled --tun=userspace-networking \
+            --state="$TS_STATE_DIR/tailscaled.state" \
+            --socket="$TS_SOCKET" &>/tmp/tailscaled.log &
+    fi
 
     # Wait for socket to be ready
     for i in $(seq 1 30); do
@@ -92,6 +99,9 @@ if [ -n "${TS_AUTHKEY:-}" ]; then
     if [ -n "${TS_HOSTNAME:-}" ]; then
         TS_ARGS="$TS_ARGS --hostname=$TS_HOSTNAME"
     fi
+    if [ -c /dev/net/tun ]; then
+        TS_ARGS="$TS_ARGS --netfilter-mode=off"
+    fi
 
     echo "Running tailscale up..."
     if ! timeout 30 tailscale up --authkey="$TS_AUTHKEY" $TS_ARGS --ssh --accept-risk=lose-ssh; then
@@ -99,7 +109,11 @@ if [ -n "${TS_AUTHKEY:-}" ]; then
         echo "tailscaled logs:"
         cat /tmp/tailscaled.log
     else
-        echo "Tailscale connected (SSH enabled)"
+        if [ -c /dev/net/tun ]; then
+            echo "Tailscale connected (tun mode, SSH enabled)"
+        else
+            echo "Tailscale connected (userspace mode, SSH enabled)"
+        fi
     fi
 fi
 
