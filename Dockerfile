@@ -36,7 +36,7 @@ RUN apt-get update && apt-get install -y \
 RUN ARCH=$(uname -m) && \
     if [ "$ARCH" = "aarch64" ]; then NV_ARCH="linux-arm64"; \
     else NV_ARCH="linux-x86_64"; fi && \
-    curl -Lo nvim.tar.gz "https://github.com/neovim/neovim/releases/download/${NVIM_VERSION}/nvim-${NV_ARCH}.tar.gz" && \
+    curl -fsSLo nvim.tar.gz "https://github.com/neovim/neovim/releases/download/${NVIM_VERSION}/nvim-${NV_ARCH}.tar.gz" && \
     tar -xzf nvim.tar.gz && \
     mv nvim-${NV_ARCH} /opt/nvim && \
     ln -s /opt/nvim/bin/nvim /usr/local/bin/nvim && \
@@ -49,7 +49,7 @@ RUN ARCH=$(uname -m) && \
     else \
         LG_ARCH="x86_64"; \
     fi && \
-    curl -Lo lazygit.tar.gz \
+    curl -fsSLo lazygit.tar.gz \
     https://github.com/jesseduffield/lazygit/releases/download/${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION#v}_Linux_${LG_ARCH}.tar.gz && \
     tar -xzf lazygit.tar.gz lazygit && \
     install lazygit /usr/local/bin && \
@@ -59,7 +59,7 @@ RUN ARCH=$(uname -m) && \
 RUN ARCH=$(uname -m) && \
     if [ "$ARCH" = "aarch64" ]; then CRUSH_ARCH="arm64"; \
     else CRUSH_ARCH="amd64"; fi && \
-    curl -Lo /tmp/crush.deb \
+    curl -fsSLo /tmp/crush.deb \
       "https://github.com/charmbracelet/crush/releases/download/${CRUSH_VERSION}/crush_${CRUSH_VERSION#v}_${CRUSH_ARCH}.deb" && \
     dpkg -i /tmp/crush.deb && \
     rm /tmp/crush.deb
@@ -68,13 +68,13 @@ RUN ARCH=$(uname -m) && \
 RUN ARCH=$(uname -m) && \
     if [ "$ARCH" = "aarch64" ]; then GLOW_ARCH="arm64"; \
     else GLOW_ARCH="amd64"; fi && \
-    curl -Lo /tmp/glow.deb \
+    curl -fsSLo /tmp/glow.deb \
       "https://github.com/charmbracelet/glow/releases/download/${GLOW_VERSION}/glow_${GLOW_VERSION#v}_${GLOW_ARCH}.deb" && \
     dpkg -i /tmp/glow.deb && \
     rm /tmp/glow.deb
 
 # TypeScript tooling
-RUN npm install -g npm typescript typescript-language-server ts-node tsx http-server eslint bash-language-server markserv
+RUN npm install -g --ignore-scripts npm typescript typescript-language-server ts-node tsx http-server eslint bash-language-server markserv
 
 # Install Deno
 RUN curl -fsSL https://deno.land/install.sh | sh \
@@ -115,9 +115,9 @@ COPY tmux/renumber-sess.sh /etc/tmux/renumber-sess.sh
 COPY tmux/session-status.sh /etc/tmux/session-status.sh
 RUN chmod +x /etc/tmux/popup.sh /etc/tmux/renumber-sess.sh /etc/tmux/session-status.sh
 
-# Install TPM and tmux-yank at build time
-RUN git clone https://github.com/tmux-plugins/tpm /opt/tmux-plugins/tpm \
-    && git clone https://github.com/tmux-plugins/tmux-yank /opt/tmux-plugins/tmux-yank
+# Install TPM and tmux-yank at build time (pinned to specific releases)
+RUN git clone --single-branch --depth 1 --branch v1.2.1 https://github.com/tmux-plugins/tpm /opt/tmux-plugins/tpm \
+    && git clone --single-branch --depth 1 --branch v2.3.0 https://github.com/tmux-plugins/tmux-yank /opt/tmux-plugins/tmux-yank
 
 # Entrypoint
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh

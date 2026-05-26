@@ -107,15 +107,7 @@ fi
 
 mkdir -p "$NVIM_CONFIG_DIR"
 if [ ! -f "$NVIM_CONFIG" ]; then
-    echo "Fetching Neovim config from Gist..."
-    if curl -fsSL https://gist.github.com/limxingzhi/fa3be5045caded9d4e09f2423dbfcec7/raw -o "$NVIM_CONFIG" 2>/dev/null; then
-        echo "Config fetched successfully"
-    else
-        echo "Gist fetch failed, using default config"
-        cp /etc/nvim/init.lua "$NVIM_CONFIG"
-    fi
-else
-    echo "Using existing Neovim config"
+    cp /etc/nvim/init.lua "$NVIM_CONFIG"
 fi
 
 grep -qxF 'source /etc/zsh/init.zsh' "$ZSHRC" 2>/dev/null || echo 'source /etc/zsh/init.zsh' >> "$ZSHRC"
