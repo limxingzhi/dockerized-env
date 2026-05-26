@@ -20,6 +20,12 @@ Docker dev environment on `node:24-bookworm`: neovim, tmux, lazygit, TypeScript,
 
 No test suite, no linter. Verify changes with `docker build`.
 
+## Setup (one-time, host only)
+
+| Step | Command |
+|------|---------|
+| Verify skill loaded | `crush skill list` should show `check-versions` |
+
 ## Architecture
 
 ```
@@ -42,7 +48,8 @@ Dockerfile
   │    ├─ popup.sh          → Scratch popup (prefix+s)
   │    ├─ session-status.sh → Status-right: * before hostname if scratch exists
   │    └─ renumber-sess.sh  → Renumber numeric sessions
-  ├─ skills/                → /etc/agents/skills/
+  ├─ skills/                → Container skills (copied into image at /etc/agents/skills/)
+  ├─ .agents/skills/        → Repo skills (auto-discovered by Crush and other tools)
   └─ .github/workflows/publish.yml → Multi-arch GHCR publish
 ```
 
