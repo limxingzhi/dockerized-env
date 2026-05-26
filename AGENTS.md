@@ -54,6 +54,7 @@ Configs live in `/etc/` so they survive volume mounts on `/root`.
 - No hardcoded secrets - `$ENV_VAR` only. Scan staged files before committing.
 - Commit messages: lowercase, imperative, no period (e.g. `add scratch session indicator`).
 - Follow existing file naming and code style. Match what's already there.
+- When adding/updating skills, review frontmatter: set `user-invocable: true` on skills designed for manual invocation (trigger phrases, argument hints). Omit on auto-triggered knowledge-only skills.
 
 ## Gotchas
 
