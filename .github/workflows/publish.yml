@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - dev
   workflow_dispatch:
     inputs:
       no-cache:
@@ -41,9 +42,13 @@ jobs:
         run: |
           REPO=ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
           DATE=$(date +'%Y.%m.%d')
-          TAG_PREFIX="latest"
-          TAG_DATE="${DATE}"
-          echo "tags=${REPO}:${TAG_PREFIX},${REPO}:${TAG_DATE}" >> $GITHUB_OUTPUT
+          BRANCH=${{ github.ref_name }}
+          if [ "$BRANCH" = "main" ]; then
+            TAGS="${REPO}:latest,${REPO}:${DATE}"
+          else
+            TAGS="${REPO}:${BRANCH},${REPO}:${BRANCH}-${DATE}"
+          fi
+          echo "tags=$TAGS" >> $GITHUB_OUTPUT
 
       - name: Build and push image
         uses: docker/build-push-action@v7
