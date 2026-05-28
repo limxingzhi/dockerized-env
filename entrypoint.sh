@@ -105,17 +105,9 @@ if [ -n "${TS_AUTHKEY:-}" ]; then
 fi
 
 
-NVIM_GIST_URL=https://gist.githubusercontent.com/limxingzhi/fa3be5045caded9d4e09f2423dbfcec7/raw/init.lua
-
 mkdir -p "$NVIM_CONFIG_DIR"
 if [ ! -f "$NVIM_CONFIG" ]; then
-    echo "Fetching nvim config from Gist..."
-    if curl -fsSL "$NVIM_GIST_URL" -o "$NVIM_CONFIG" 2>/dev/null; then
-        echo "nvim config fetched from Gist"
-    else
-        echo "Gist fetch failed, using fallback config"
-        cp /etc/nvim/init.lua "$NVIM_CONFIG"
-    fi
+    cp /etc/nvim/init.lua "$NVIM_CONFIG"
 fi
 
 grep -qxF 'source /etc/zsh/init.zsh' "$ZSHRC" 2>/dev/null || echo 'source /etc/zsh/init.zsh' >> "$ZSHRC"

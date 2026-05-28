@@ -89,8 +89,8 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
 # Home as workspace
 WORKDIR /root
 
-# Default nvim config fallback (outside /root, survives bind mounts)
-RUN mkdir -p /etc/nvim && echo 'vim.o.number = true' > /etc/nvim/init.lua
+# Default nvim config (outside /root, survives bind mounts)
+RUN mkdir -p /etc/nvim && curl -fsSL https://gist.github.com/limxingzhi/fa3be5045caded9d4e09f2423dbfcec7/raw -o /etc/nvim/init.lua
 
 # Persist home directory across restarts (configs, projects, etc.)
 VOLUME /root
