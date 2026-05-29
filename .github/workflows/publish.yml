@@ -6,11 +6,6 @@ on:
       - main
       - dev
   workflow_dispatch:
-    inputs:
-      no-cache:
-        description: 'Build without cache'
-        type: boolean
-        default: false
 
 jobs:
   build-and-push:
@@ -57,6 +52,4 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.tags.outputs.tags }}
-          cache-from: ${{ (github.ref_name != 'main' && github.event.inputs.no-cache != 'true') && 'type=gha' || '' }}
-          cache-to: ${{ (github.ref_name != 'main' && github.event.inputs.no-cache != 'true') && 'type=gha,mode=max' || '' }}
-          no-cache: ${{ github.ref_name == 'main' || github.event.inputs.no-cache == 'true' }}
+          no-cache: true
