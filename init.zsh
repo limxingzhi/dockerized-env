@@ -12,3 +12,7 @@ tat() {
         tmux switch-client -t "$1" || (tmux new-session -d -s "$1" && tmux switch-client -t "$1")
     fi
 }
+
+if [[ -o login ]]; then
+    bash /usr/local/bin/motd.sh
+fi

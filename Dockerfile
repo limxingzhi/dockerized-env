@@ -107,6 +107,7 @@ ENV CRUSH_GLOBAL_CONFIG=/etc/crush/crush.json
 
 # Shell config (outside /root so it survives bind mounts)
 COPY init.zsh /etc/zsh/init.zsh
+COPY zshrc /etc/zsh/zshrc
 
 # Tmux config (outside /root so it survives bind mounts)
 COPY tmux/tmux.conf /etc/tmux/tmux.conf
