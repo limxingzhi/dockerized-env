@@ -121,7 +121,8 @@ RUN git clone --single-branch --depth 1 --branch v1.2.1 https://github.com/tmux-
 
 # Entrypoint
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+COPY scripts/motd.sh /usr/local/bin/motd.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/motd.sh
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["zsh"]

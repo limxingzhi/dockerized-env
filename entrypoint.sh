@@ -112,6 +112,9 @@ fi
 
 grep -qxF 'source /etc/zsh/init.zsh' "$ZSHRC" 2>/dev/null || echo 'source /etc/zsh/init.zsh' >> "$ZSHRC"
 
+# Show MOTD
+bash /usr/local/bin/motd.sh
+
 # If stdin is a tty, exec into the shell. Otherwise just keep the container alive.
 if [ -t 0 ]; then
     exec "$@"
