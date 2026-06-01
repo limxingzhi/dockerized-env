@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// mserve — serve .md files with frontmatter (as a table) + mermaid + GitHub CSS
+// ms — serve .md files with frontmatter (as a table) + mermaid + GitHub CSS
 //
-// Usage: mserve [port] [address]
+// Usage: ms [port] [address]
 //   port    HTTP port (default: 3456)
 //   address Bind address (default: 0.0.0.0)
 //
@@ -11,7 +11,6 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const url = require('url');
 
 const MARKDOWN_IT = '/usr/local/lib/node_modules/markserv/node_modules/markdown-it';
 const PLUGINS = {
@@ -22,7 +21,7 @@ const PLUGINS = {
 
 const PORT = parseInt(process.argv[2], 10) || 3456;
 const ADDR = process.argv[3] || '0.0.0.0';
-const ROOT = process.cwd();
+const ROOT = fs.realpathSync(process.cwd());
 
 // --- Markdown renderer ---
 const md = require(MARKDOWN_IT)({
@@ -69,7 +68,7 @@ function renderMarkdown(content) {
 
   let markdown = body;
   if (entries.length > 0) {
-    const table = '| | |\n|---|---|\n' +
+    const table = '| Field | Value |\n|---|---|\n' +
       entries.map(([k, v]) => `| **${k}** | ${v} |`).join('\n') +
       '\n\n---\n\n';
     markdown = table + body;
@@ -119,10 +118,30 @@ const MIME = {
   '.ttf': 'font/ttf',
 };
 
+// --- Directory listing ---
+function dirListing(dirPath, requestPath) {
+  const items = fs.readdirSync(dirPath);
+  const rows = items
+    .filter(item => !item.startsWith('.'))
+    .map(item => {
+      const full = path.join(dirPath, item);
+      const isDir = fs.statSync(full).isDirectory();
+      const suffix = isDir ? '/' : '';
+      return `<tr><td><a href="${path.join(requestPath, item)}${suffix}">${item}${suffix}</a></td></tr>`;
+    })
+    .join('\n');
+
+  const title = `Index of ${requestPath}`;
+  return htmlPage(title, `<h1>${title}</h1>\n<table>${rows}</table>`, false);
+}
+
 // --- Server ---
 const server = http.createServer((req, res) => {
-  const parsed = url.parse(req.url);
+  const parsed = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   let filePath = path.normalize(path.join(ROOT, parsed.pathname));
+
+  // Resolve symlinks so they can't escape ROOT
+  try { filePath = fs.realpathSync(filePath); } catch {}
 
   // Security: ensure we don't escape ROOT
   if (!filePath.startsWith(ROOT)) {
@@ -131,13 +150,25 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // Serve index.md or index.html for directories
+  // Serve index.md or index.html for directories, or fall back to directory listing
   if (parsed.pathname.endsWith('/')) {
-    const idx = path.join(filePath, 'index.md');
-    if (fs.existsSync(idx)) filePath = idx;
-    else {
-      const idxHtml = path.join(filePath, 'index.html');
-      if (fs.existsSync(idxHtml)) filePath = idxHtml;
+    const idxMd = path.join(filePath, 'index.md');
+    const idxHtml = path.join(filePath, 'index.html');
+    if (fs.existsSync(idxMd)) {
+      filePath = idxMd;
+    } else if (fs.existsSync(idxHtml)) {
+      filePath = idxHtml;
+    } else {
+      // Directory listing fallback
+      try {
+        const html = dirListing(filePath, parsed.pathname);
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(html);
+      } catch {
+        res.writeHead(500);
+        res.end('Error listing directory');
+      }
+      return;
     }
   }
 
@@ -166,6 +197,11 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, ADDR, () => {
-  console.error(`mserve → http://${ADDR}:${PORT}/`);
-});
+// Export for testing (allows tests to start/stop the server)
+module.exports = { server, PORT, ADDR, ROOT };
+
+if (require.main === module) {
+  server.listen(PORT, ADDR, () => {
+    console.error(`ms → http://${ADDR}:${PORT}/`);
+  });
+}
